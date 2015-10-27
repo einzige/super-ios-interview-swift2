@@ -1,7 +1,7 @@
 import UIKit
 
 class StyledButton: UIButton {
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         layer.borderWidth = 1
         layer.cornerRadius = 3

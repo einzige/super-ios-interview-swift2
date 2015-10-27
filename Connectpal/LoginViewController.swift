@@ -9,7 +9,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     @IBAction func login() {
         blockUIWithPendingLogIn()
         
-        sessionManager.signIn(emailField.text, password: passwordField.text,
+        sessionManager.signIn(emailField.text!, password: passwordField.text!,
             onSuccess: onLoginSuccess,
             onFail: onLoginFailed)
     }
@@ -36,7 +36,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         return true
     }
     
-    override func shouldPerformSegueWithIdentifier(identifier: String?, sender: AnyObject?) -> Bool {
+    override func shouldPerformSegueWithIdentifier(identifier: String, sender: AnyObject?) -> Bool {
         return identifier != "login_success"
     }
     

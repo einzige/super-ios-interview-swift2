@@ -41,7 +41,7 @@ import AVFoundation
     }()
     
     lazy var item: AVPlayerItem = {
-        return AVPlayerItem(URL: NSURL(string: self.filePath!))
+        return AVPlayerItem(URL: NSURL(string: self.filePath!)!)
     }()
     
     var position: Float {
