@@ -9,7 +9,7 @@ class DesignableView: UIView {
         xibSetup()
     }
     
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         xibSetup()
     }
@@ -17,7 +17,7 @@ class DesignableView: UIView {
     func xibSetup() {
         view = loadViewFromNib()
         view.frame = bounds
-        view.autoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
+        view.autoresizingMask = [UIViewAutoresizing.FlexibleWidth, UIViewAutoresizing.FlexibleHeight]
         setupView()
         addSubview(view)
     }
@@ -29,7 +29,7 @@ class DesignableView: UIView {
         let bundle = NSBundle(forClass: self.dynamicType)
         let nib = UINib(nibName: nibName!, bundle: bundle)
         
-        let view = nib.instantiateWithOwner(self, options: nil)[0] as UIView
+        let view = nib.instantiateWithOwner(self, options: nil)[0] as! UIView
         return view
     }
 }

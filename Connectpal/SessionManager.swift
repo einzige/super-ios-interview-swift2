@@ -12,7 +12,7 @@ public class SessionManager {
                 let responseData = response.getData()
                 
                 if responseData["user"] != nil {
-                    self.userData = responseData["user"] as [String: AnyObject]
+                    self.userData = responseData["user"] as! [String: AnyObject]
                 }
                 
                 onSuccess?()

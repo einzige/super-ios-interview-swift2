@@ -11,7 +11,7 @@ class FeedViewController: UICollectionViewController, UICollectionViewDelegateFl
     }
     
     func postsLoaded(response: APIResponse) {
-        self.posts = response.getData()["posts"] as [AnyObject]
+        self.posts = response.getData()["posts"] as! [AnyObject]
         self.collectionView?.reloadData()
         loader.hidden = true
     }
@@ -29,8 +29,8 @@ class FeedViewController: UICollectionViewController, UICollectionViewDelegateFl
     }
 
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("post-cell", forIndexPath: indexPath) as PostCell
-        let post = Post(data: posts[indexPath.row] as [String: AnyObject])
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("post-cell", forIndexPath: indexPath) as! PostCell
+        let post = Post(data: posts[indexPath.row] as! [String: AnyObject])
         let author = post.user!
         
         cell.pullFields(post)
@@ -40,14 +40,15 @@ class FeedViewController: UICollectionViewController, UICollectionViewDelegateFl
             
             if image == nil {
                 // If the image does not exist, we need to download it
-                var imgURL: NSURL = NSURL(string: author.smallProfilePictureUrl!)!
+                let imgURL: NSURL = NSURL(string: author.smallProfilePictureUrl!)!
                 
                 // Download an NSData representation of the image at the URL
                 let request: NSURLRequest = NSURLRequest(URL: imgURL)
                 
-                NSURLConnection.sendAsynchronousRequest(request, queue: NSOperationQueue.mainQueue(), completionHandler: {(response: NSURLResponse!, data: NSData!, error: NSError!) -> Void in
+                
+                NSURLConnection.sendAsynchronousRequest(request, queue: NSOperationQueue.mainQueue(), completionHandler: {(response: NSURLResponse?, data: NSData?, error: NSError?) -> Void in
                     if error == nil {
-                        image = UIImage(data: data)
+                        image = UIImage(data: data!)
                         
                         // Store the image into the cache
                         self.profileImageCache[author.ID] = image! as UIImage
@@ -58,7 +59,7 @@ class FeedViewController: UICollectionViewController, UICollectionViewDelegateFl
                         })
                     }
                     else {
-                        println("Error: \(error.localizedDescription)")
+                        print("Error: \(error!.localizedDescription)")
                     }
                 })
             } else {
@@ -77,7 +78,7 @@ class FeedViewController: UICollectionViewController, UICollectionViewDelegateFl
     }
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-        let post = Post(data: posts[indexPath.row] as [String: AnyObject])
+        let post = Post(data: posts[indexPath.row] as! [String: AnyObject])
         
         // Virtual label to estimate cell's height
         let label = UILabel()

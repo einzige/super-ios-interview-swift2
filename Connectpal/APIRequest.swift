@@ -37,7 +37,7 @@ public class APIRequest {
     }
     
     private func buildHTTPRequest(url: String, type: String = "GET") -> NSMutableURLRequest {
-        var request = NSMutableURLRequest(URL: NSURL(string: url)!)
+        let request = NSMutableURLRequest(URL: NSURL(string: url)!)
         
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -54,7 +54,13 @@ public class APIRequest {
     private func sendRequest(request: NSMutableURLRequest) -> APIResponse {
         var response: NSURLResponse?
         var e: NSError?
-        let data = NSURLConnection.sendSynchronousRequest(request, returningResponse: &response, error: &e)
+        let data: NSData?
+        do {
+            data = try NSURLConnection.sendSynchronousRequest(request, returningResponse: &response)
+        } catch let error as NSError {
+            e = error
+            data = nil
+        }
         
         if e != nil {
             return APIResponse(data: ["error": e!.localizedDescription])
@@ -68,22 +74,18 @@ public class APIRequest {
     }
     
     private func responseDataToDictionary(data: NSData) -> [String: AnyObject] {
-        var e: NSError?
-        var jsonObj = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: &e) as [String: AnyObject]
-        
-        if e != nil {
+        guard let jsonObj = try? NSJSONSerialization.JSONObjectWithData(data, options: []) as? [String: AnyObject] else {
             return [String: AnyObject]()
-        } else {
-            return jsonObj
         }
+        return jsonObj!
     }
     
     private func toJSON(value: AnyObject, prettyPrinted: Bool = false) -> String {
-        var options = prettyPrinted ? NSJSONWritingOptions.PrettyPrinted : nil
+        let options = prettyPrinted ? NSJSONWritingOptions.PrettyPrinted : []
         
         if NSJSONSerialization.isValidJSONObject(value) {
-            if let data = NSJSONSerialization.dataWithJSONObject(value, options: options, error: nil) {
-                if let string = NSString(data: data, encoding: NSUTF8StringEncoding) {
+            if let data = try? NSJSONSerialization.dataWithJSONObject(value, options: options) {
+                if let string = NSString(data: data, encoding: NSUTF8StringEncoding) as? String {
                     return string
                 }
             }

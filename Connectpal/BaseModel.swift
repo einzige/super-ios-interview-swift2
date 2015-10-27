@@ -18,7 +18,7 @@ class BaseModel {
     }
     
     var ID: Int {
-        get { return self["id"] as Int }
+        get { return self["id"] as! Int }
     }
     
     func afterInit() {
