@@ -6,7 +6,7 @@ class Post: BaseModel {
     }
 
     var title: String? {
-        set(newVal) { self["title"] = newVal }
+        set(newVal) { self["title"] = newVal as AnyObject? }
         
         get {
             if self["title"] != nil {
@@ -18,7 +18,7 @@ class Post: BaseModel {
     }
     
     var message: String? {
-        set(newVal) { self["message"] = newVal }
+        set(newVal) { self["message"] = newVal as AnyObject? }
         
         get {
             return self["message"] as? String

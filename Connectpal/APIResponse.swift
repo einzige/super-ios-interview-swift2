@@ -8,14 +8,14 @@
 
 import Foundation
 
-public class APIResponse {
-    public var data: [String: AnyObject]
+open class APIResponse {
+    open var data: [String: AnyObject]
     
     public init(data: [String: AnyObject]) {
         self.data = data
     }
     
-    public func getData() -> [String: AnyObject] {
+    open func getData() -> [String: AnyObject] {
         if data["data"] != nil {
             return data["data"] as! [String: AnyObject]
         } else {
@@ -23,7 +23,7 @@ public class APIResponse {
         }
     }
     
-    public func getToken() -> String? {
+    open func getToken() -> String? {
         if data["api_token"] != nil {
             return data["api_token"] as? String
         } else {
@@ -31,7 +31,7 @@ public class APIResponse {
         }
     }
     
-    public func isSuccess() -> Bool {
+    open func isSuccess() -> Bool {
         return data["status"] as? String == "success"
     }
 }

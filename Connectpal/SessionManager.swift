@@ -1,9 +1,9 @@
 import Foundation
 
-public class SessionManager {
-    public var userData: [String: AnyObject] = [String: AnyObject]()
+open class SessionManager {
+    open var userData: [String: AnyObject] = [String: AnyObject]()
     
-    public func signIn(email: String, password: String,
+    open func signIn(_ email: String, password: String,
         onSuccess: (() -> ())? = nil,
         onFail: (() -> ())? = nil)
     {
@@ -22,15 +22,15 @@ public class SessionManager {
         }
     }
     
-    public func registrationToken() -> String? {
+    open func registrationToken() -> String? {
         return userData["registration_token"] as? String
     }
     
-    public func isSignedIn() -> Bool {
+    open func isSignedIn() -> Bool {
         return api.isAuthorized()
     }
     
-    public func signOut() {
+    open func signOut() {
         api.resetSession()
     }
 }

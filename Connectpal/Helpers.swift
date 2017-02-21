@@ -1,20 +1,20 @@
 import Foundation
 
 // Background syntax sugar
-infix operator ~> {}
+infix operator ~>
 
 // Queue for dispatch serial operator
-private let queue = dispatch_queue_create("serial-worker", DISPATCH_QUEUE_SERIAL)
+private let queue = DispatchQueue(label: "serial-worker", attributes: [])
 
 // ( background ) ~> ( main thread callback )
 func ~> <R> (
-    backgroundClosure: () -> R,
-    mainClosure: (result: R) -> ())
+    backgroundClosure: @escaping () -> R,
+    mainClosure: @escaping (_ result: R) -> ())
 {
-    dispatch_async(queue) {
+    queue.async {
         let result = backgroundClosure()
-        dispatch_async(dispatch_get_main_queue(), {
-            mainClosure(result: result)
+        DispatchQueue.main.async(execute: {
+            mainClosure(result)
         })
     }
 }

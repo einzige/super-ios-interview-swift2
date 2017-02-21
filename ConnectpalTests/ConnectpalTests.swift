@@ -27,22 +27,22 @@ class ConnectpalTests: XCTestCase {
     }
     
     func testResponseWithToken() {
-        var response = APIResponse(data: ["api_token": "set"])
+        var response = APIResponse(data: ["api_token": "set" as AnyObject])
         
         XCTAssertTrue(response.getToken() == "set")
     }
     
     func testResponseWithData() {
         var data = ["data": ["One": 1, "Two": 2]]
-        var response = APIResponse(data: data)
+        var response = APIResponse(data: data as [String : AnyObject])
         var responseData = response.getData()
         
-        XCTAssertTrue(responseData["One"] as Int == 1)
-        XCTAssertTrue(responseData["Two"] as Int == 2)
+        XCTAssertTrue(responseData["One"] as! Int == 1)
+        XCTAssertTrue(responseData["Two"] as! Int == 2)
     }
     
     func testSuccessResponse() {
-        var response = APIResponse(data: ["status": "success"])
+        var response = APIResponse(data: ["status": "success" as AnyObject])
         XCTAssertTrue(response.isSuccess() == true)
     }
 }

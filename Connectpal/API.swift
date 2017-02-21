@@ -1,15 +1,15 @@
 import Foundation
 
-public class API {
-    public var token: String?
-    private var request: APIRequest
+open class API {
+    open var token: String?
+    fileprivate var request: APIRequest
     
     public init(token: String? = nil) {
         self.token = token
         self.request = APIRequest(token: token)
     }
     
-    public func signIn(email: String, password: String, callback: ((APIResponse) -> ())?) {
+    open func signIn(_ email: String, password: String, callback: ((APIResponse) -> ())?) {
         {
             return self.post("/sessions", params: ["email": email, "password": password])
         } ~> { (response: APIResponse) in
@@ -21,27 +21,27 @@ public class API {
         }
     }
     
-    public func feed() -> APIResponse {
+    open func feed() -> APIResponse {
         return self.get("/posts/feed")
     }
     
-    public func resetSession() {
+    open func resetSession() {
         self.token = nil
     }
     
-    public func isAuthorized() -> Bool {
+    open func isAuthorized() -> Bool {
         return token != nil
     }
     
-    private func get(path: String, params: [String: String]? = nil) -> APIResponse {
-        return request.get(path, params: params)
+    fileprivate func get(_ path: String, params: [String: String]? = nil) -> APIResponse {
+        return request.get(path, params: params as [String : AnyObject]?)
     }
     
-    private func post(path: String, params: [String: String]? = nil) -> APIResponse {
-        return request.post(path, params: params)
+    fileprivate func post(_ path: String, params: [String: String]? = nil) -> APIResponse {
+        return request.post(path, params: params as [String : AnyObject]?)
     }
     
-    private func authorize(token: String?) {
+    fileprivate func authorize(_ token: String?) {
         self.token = token
         self.request = APIRequest(token: token)
     }

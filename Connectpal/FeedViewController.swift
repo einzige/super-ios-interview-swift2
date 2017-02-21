@@ -6,30 +6,30 @@ class FeedViewController: UICollectionViewController, UICollectionViewDelegateFl
     var posts: [AnyObject] = [AnyObject]()
     var profileImageCache = [Int: UIImage]()
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         { return api.feed() } ~> postsLoaded
     }
     
-    func postsLoaded(response: APIResponse) {
+    func postsLoaded(_ response: APIResponse) {
         self.posts = response.getData()["posts"] as! [AnyObject]
         self.collectionView?.reloadData()
-        loader.hidden = true
+        loader.isHidden = true
     }
     
-    override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+    override func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
     
-    override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return posts.count
     }
     
-    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         collectionViewLayout.invalidateLayout()
     }
 
-    override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("post-cell", forIndexPath: indexPath) as! PostCell
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "post-cell", for: indexPath) as! PostCell
         let post = Post(data: posts[indexPath.row] as! [String: AnyObject])
         let author = post.user!
         
@@ -40,20 +40,20 @@ class FeedViewController: UICollectionViewController, UICollectionViewDelegateFl
             
             if image == nil {
                 // If the image does not exist, we need to download it
-                let imgURL: NSURL = NSURL(string: author.smallProfilePictureUrl!)!
+                let imgURL: URL = URL(string: author.smallProfilePictureUrl!)!
                 
                 // Download an NSData representation of the image at the URL
-                let request: NSURLRequest = NSURLRequest(URL: imgURL)
+                let request: URLRequest = URLRequest(url: imgURL)
                 
                 
-                NSURLConnection.sendAsynchronousRequest(request, queue: NSOperationQueue.mainQueue(), completionHandler: {(response: NSURLResponse?, data: NSData?, error: NSError?) -> Void in
+                NSURLConnection.sendAsynchronousRequest(request, queue: OperationQueue.main, completionHandler: {(response: URLResponse?, data: Data?, error: NSError?) -> Void in
                     if error == nil {
                         image = UIImage(data: data!)
                         
                         // Store the image into the cache
                         self.profileImageCache[author.ID] = image! as UIImage
-                        dispatch_async(dispatch_get_main_queue(), {
-                            if let cellToUpdate = collectionView.cellForItemAtIndexPath(indexPath) as? PostCell {
+                        DispatchQueue.main.async(execute: {
+                            if let cellToUpdate = collectionView.cellForItem(at: indexPath) as? PostCell {
                                 cellToUpdate.postImage?.image = image
                             }
                         })
@@ -61,10 +61,10 @@ class FeedViewController: UICollectionViewController, UICollectionViewDelegateFl
                     else {
                         print("Error: \(error!.localizedDescription)")
                     }
-                })
+                } as! (URLResponse?, Data?, Error?) -> Void)
             } else {
-                dispatch_async(dispatch_get_main_queue(), {
-                    if let cellToUpdate = collectionView.cellForItemAtIndexPath(indexPath) as? PostCell {
+                DispatchQueue.main.async(execute: {
+                    if let cellToUpdate = collectionView.cellForItem(at: indexPath) as? PostCell {
                         cellToUpdate.postImage?.image = image
                     }
                 })
@@ -77,7 +77,7 @@ class FeedViewController: UICollectionViewController, UICollectionViewDelegateFl
         return cell
     }
     
-    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let post = Post(data: posts[indexPath.row] as! [String: AnyObject])
         
         // Virtual label to estimate cell's height
@@ -85,18 +85,18 @@ class FeedViewController: UICollectionViewController, UICollectionViewDelegateFl
         label.font = UIFont(name: "Helvetica Neue", size: 14.0)
         label.text = post.message?.htmlSafe
         label.numberOfLines = 0
-        label.lineBreakMode = NSLineBreakMode.ByWordWrapping
+        label.lineBreakMode = NSLineBreakMode.byWordWrapping
         
-        let screenSize = UIScreen.mainScreen().bounds
+        let screenSize = UIScreen.main.bounds
         let padding = 5 + 5 as CGFloat
         let margin = 5 + 5 as CGFloat
         
         let labelWidth = screenSize.width - padding - margin
         let maxHeight = 3999 as CGFloat
         
-        let maxLabelSize = CGSizeMake(labelWidth, maxHeight)
+        let maxLabelSize = CGSize(width: labelWidth, height: maxHeight)
         let size = label.sizeThatFits(maxLabelSize)
     
-        return CGSizeMake(screenSize.width - margin, size.height + 120)
+        return CGSize(width: screenSize.width - margin, height: size.height + 120)
     }
 }
