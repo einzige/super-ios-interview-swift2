@@ -17,15 +17,15 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     override func viewDidLoad() {
         emailField.delegate = self
         passwordField.delegate = self
-        emailField.canBecomeFirstResponder()
-        passwordField.canBecomeFirstResponder()
+        emailField.canBecomeFirstResponder
+        passwordField.canBecomeFirstResponder
         api.resetSession()
         emailField.text = "will@connectpal.com"
         passwordField.text = "password"
         super.viewDidLoad()
     }
     
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if (textField == passwordField) {
             passwordField.resignFirstResponder()
             login()
@@ -36,44 +36,44 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         return true
     }
     
-    override func shouldPerformSegueWithIdentifier(identifier: String, sender: AnyObject?) -> Bool {
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
         return identifier != "login_success"
     }
     
-    private func onLoginSuccess() {
+    fileprivate func onLoginSuccess() {
         restoreUIAfterLogIn()
-        performSegueWithIdentifier("login_success", sender: self)
+        performSegue(withIdentifier: "login_success", sender: self)
     }
     
-    private func onLoginFailed() {
+    fileprivate func onLoginFailed() {
         restoreUIAfterLogIn()
         
         let alertController = UIAlertController(
             title: "Failed to Log In",
             message: "The email or password you entered doesn't appear to belong to an account. Please check your credentials and try again.",
-            preferredStyle: UIAlertControllerStyle.Alert)
+            preferredStyle: UIAlertControllerStyle.alert)
         
-        alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
+        alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
         
-        self.presentViewController(alertController, animated: true, completion: nil)
+        self.present(alertController, animated: true, completion: nil)
     }
     
-    private func blockUIWithPendingLogIn() {
-        logInIndicator.hidden = false
+    fileprivate func blockUIWithPendingLogIn() {
+        logInIndicator.isHidden = false
         logInIndicator.startAnimating()
-        emailField.enabled = false
-        passwordField.enabled = false
-        logInButton.enabled = false
+        emailField.isEnabled = false
+        passwordField.isEnabled = false
+        logInButton.isEnabled = false
         logInButton.titleLabel!.text = "Please wait..."
     }
     
-    private func restoreUIAfterLogIn() {
-        logInIndicator.hidden = true
+    fileprivate func restoreUIAfterLogIn() {
+        logInIndicator.isHidden = true
         logInIndicator.stopAnimating()
-        emailField.enabled = true
-        passwordField.enabled = true
+        emailField.isEnabled = true
+        passwordField.isEnabled = true
         passwordField.text = ""
-        logInButton.enabled = true
+        logInButton.isEnabled = true
         logInButton.titleLabel!.text = "Log In"
     }
 }

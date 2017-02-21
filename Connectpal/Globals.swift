@@ -1,9 +1,9 @@
 import UIKit
 
 enum Environment : Int {
-    case Development
-    case Production
-    case Test
+    case development
+    case production
+    case test
 }
 
 class Globals {
@@ -11,7 +11,7 @@ class Globals {
        return Player()
     }()
     
-    var mode = Environment.Development
+    var mode = Environment.development
     
     lazy var logger: Logger = {
         return Logger()

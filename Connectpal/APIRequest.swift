@@ -1,6 +1,6 @@
 import Foundation
 
-public class APIRequest {
+open class APIRequest {
     let host = "http://localhost:3000"
     let namespace = "/api"
     
@@ -10,34 +10,34 @@ public class APIRequest {
         self.token = token
     }
     
-    public func get(path: String, params: [String: AnyObject]? = nil) -> APIResponse {
+    open func get(_ path: String, params: [String: AnyObject]? = nil) -> APIResponse {
         return getJSON(buildURL(path))
     }
     
-    public func post(path: String, params: [String: AnyObject]? = nil) -> APIResponse {
-        return postJSON(buildURL(path), data: params)
+    open func post(_ path: String, params: [String: AnyObject]? = nil) -> APIResponse {
+        return postJSON(buildURL(path), data: params as AnyObject?)
     }
     
-    private func buildURL(path: String) -> String {
-        return (host + namespace + "/" + path).stringByReplacingOccurrencesOfString("//", withString: "/")
+    fileprivate func buildURL(_ path: String) -> String {
+        return (host + namespace + "/" + path).replacingOccurrences(of: "//", with: "/")
     }
     
-    private func getJSON(url: String) -> APIResponse {
+    fileprivate func getJSON(_ url: String) -> APIResponse {
         return sendRequest(buildHTTPRequest(url))
     }
     
-    private func postJSON(url: String, data: AnyObject? = nil) -> APIResponse {
+    fileprivate func postJSON(_ url: String, data: AnyObject? = nil) -> APIResponse {
         let request = buildHTTPRequest(url, type: "POST")
         
         if data != nil {
-            request.HTTPBody = toJSON(data!).dataUsingEncoding(NSUTF8StringEncoding)
+            request.httpBody = toJSON(data!).data(using: String.Encoding.utf8)
         }
     
         return sendRequest(request)
     }
     
-    private func buildHTTPRequest(url: String, type: String = "GET") -> NSMutableURLRequest {
-        let request = NSMutableURLRequest(URL: NSURL(string: url)!)
+    fileprivate func buildHTTPRequest(_ url: String, type: String = "GET") -> NSMutableURLRequest {
+        let request = NSMutableURLRequest(url: URL(string: url)!)
         
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -46,24 +46,24 @@ public class APIRequest {
             request.setValue("Token token=\(token!)", forHTTPHeaderField: "Authorization")
         }
         
-        request.HTTPMethod = type
+        request.httpMethod = type
         
         return request
     }
     
-    private func sendRequest(request: NSMutableURLRequest) -> APIResponse {
-        var response: NSURLResponse?
+    fileprivate func sendRequest(_ request: NSMutableURLRequest) -> APIResponse {
+        var response: URLResponse?
         var e: NSError?
-        let data: NSData?
+        let data: Data?
         do {
-            data = try NSURLConnection.sendSynchronousRequest(request, returningResponse: &response)
+            data = try NSURLConnection.sendSynchronousRequest(request as URLRequest, returning: &response)
         } catch let error as NSError {
             e = error
             data = nil
         }
         
         if e != nil {
-            return APIResponse(data: ["error": e!.localizedDescription])
+            return APIResponse(data: ["error": e!.localizedDescription as AnyObject])
         }
         
         if data != nil {
@@ -73,19 +73,19 @@ public class APIRequest {
         return APIResponse(data: [String: AnyObject]())
     }
     
-    private func responseDataToDictionary(data: NSData) -> [String: AnyObject] {
-        guard let jsonObj = try? NSJSONSerialization.JSONObjectWithData(data, options: []) as? [String: AnyObject] else {
+    fileprivate func responseDataToDictionary(_ data: Data) -> [String: AnyObject] {
+        guard let jsonObj = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject] else {
             return [String: AnyObject]()
         }
         return jsonObj!
     }
     
-    private func toJSON(value: AnyObject, prettyPrinted: Bool = false) -> String {
-        let options = prettyPrinted ? NSJSONWritingOptions.PrettyPrinted : []
+    fileprivate func toJSON(_ value: AnyObject, prettyPrinted: Bool = false) -> String {
+        let options = prettyPrinted ? JSONSerialization.WritingOptions.prettyPrinted : []
         
-        if NSJSONSerialization.isValidJSONObject(value) {
-            if let data = try? NSJSONSerialization.dataWithJSONObject(value, options: options) {
-                if let string = NSString(data: data, encoding: NSUTF8StringEncoding) as? String {
+        if JSONSerialization.isValidJSONObject(value) {
+            if let data = try? JSONSerialization.data(withJSONObject: value, options: options) {
+                if let string = NSString(data: data, encoding: String.Encoding.utf8.rawValue) as? String {
                     return string
                 }
             }
